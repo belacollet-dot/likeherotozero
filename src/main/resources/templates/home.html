@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: head('Home')}"></head>
+
+<body>
+
+<header th:replace="~{fragments/header :: header}"></header>
+
+<main class="container">
+
+    <section class="intro">
+        <h1>Welcome</h1>
+        <p>
+            Please select any number of countries to compare their CO&#8322; emissions in the chart below.
+        </p>
+    </section>
+
+    <section class="card">
+
+        <h2>Country Selection</h2>
+
+        <div class="search-row">
+            <input id="search"
+                   type="text"
+                   placeholder="Search by country or ISO code">
+
+            <form method="post"
+                  th:action="@{/countries/reset}">
+                <button type="submit"
+                        class="button gray">
+                    Reset Selection
+                </button>
+            </form>
+        </div>
+
+        <div class="country-list">
+
+            <div th:if="${countries.isEmpty()}"
+                 class="empty">
+                No countries found.
+            </div>
+
+            <form th:each="country : ${countries}"
+                  method="post"
+                  th:action="@{/countries/toggle}"
+                  class="country-form">
+
+                <input type="hidden"
+                       name="countryId"
+                       th:value="${country.id}">
+
+                <button type="submit"
+                        class="country-item"
+                        th:classappend="${selectedIds.contains(country.id)} ? 'selected' : ''">
+
+                    <span class="check-icon"
+                          th:text="${selectedIds.contains(country.id)} ? '✓' : '□'">
+                    </span>
+
+                    <span th:text="${country.name}"></span>
+
+                    <small th:text="'(' + ${country.isoCode} + ')'"></small>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <section class="card chart-card">
+
+        <h2>Chart</h2>
+
+        <p th:if="${selectedIds.isEmpty()}">
+            Please select at least one country to display the chart.
+        </p>
+
+        <div th:unless="${selectedIds.isEmpty()}">
+            <div class="chart-controls">
+                <span>Time range:</span>
+                <button type="button" class="range-btn" data-years="5">5 years</button>
+                <button type="button" class="range-btn" data-years="10">10 years</button>
+                <button type="button" class="range-btn" data-years="20">20 years</button>
+                <button type="button" class="range-btn active" data-years="all">All</button>
+            </div>
+            <canvas id="emissionChart"></canvas>
+        </div>
+
+    </section>
+
+</main>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    window.chartData = /*[[${chartData}]]*/ [];
+    /*]]>*/
+</script>
+<script th:src="@{/js/chart.js}"></script>
+
+
+<script th:src="@{/js/search-filter.js}"></script>
+<script>
+    enableLiveFilter('search', '.country-form', '.country-list');
+</script>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>

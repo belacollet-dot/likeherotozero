@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: head('Scientist Dashboard')}"></head>
+
+<body>
+
+<header th:replace="~{fragments/header :: header}"></header>
+
+<main class="dashboard-container">
+
+    <section class="dashboard-intro card">
+        <h1>Scientist Dashboard</h1>
+        <p>
+            Please select a country below to review or edit its emission records.
+        </p>
+    </section>
+
+    <section class="card">
+
+        <h2>Available Countries</h2>
+
+        <div class="search-row">
+            <input id="search"
+                   type="text"
+                   placeholder="Search by country or ISO code">
+        </div>
+
+        <div class="table-wrapper scrollable">
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Country</th>
+                    <th>ISO Code</th>
+                    <th>Edit</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="country : ${countries}"
+                    th:classappend="${selectedCountry != null and selectedCountry.id == country.id} ? 'editing' : ''">
+                    <td th:text="${country.name}">
+                        Germany
+                    </td>
+
+                    <td th:text="${country.isoCode}">
+                        DEU
+                    </td>
+
+                    <td>
+                        <a class="button small blue"
+                           th:href="@{/scientist(countryId=${country.id})}">
+                            ✎
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </section>
+
+    <section class="card">
+
+        <h2 th:if="${selectedCountry == null}">
+            Edit Country
+        </h2>
+
+        <h2 th:if="${selectedCountry != null}">
+            Edit Country:
+            <span th:text="${selectedCountry.name}">
+                Germany
+            </span>
+        </h2>
+
+        <p th:if="${selectedCountry == null}"
+           class="placeholder-message">
+            Please select a country from the list above to edit its emission records.
+        </p>
+
+        <div th:if="${selectedCountry != null}">
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Reporting Year</th>
+                        <th>Emission Value (kt)</th>
+                        <th>Source</th>
+                        <th>Status</th>
+                        <th>Delete</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="record : ${records}">
+
+                        <td>
+                            <input type="hidden"
+                                   form="recordsUpdateForm"
+                                   name="recordId"
+                                   th:value="${record.id}">
+
+                            <input type="number"
+                                   form="recordsUpdateForm"
+                                   name="reportingYear"
+                                   th:value="${record.effectiveReportingYear}"
+                                   required>
+                        </td>
+
+                        <td>
+                            <input type="number"
+                                   step="any"
+                                   form="recordsUpdateForm"
+                                   name="emissionValue"
+                                   th:value="${record.effectiveEmissionValue}"
+                                   required>
+                        </td>
+
+                        <td>
+                            <input type="text"
+                                   form="recordsUpdateForm"
+                                   name="source"
+                                   th:value="${record.effectiveSource}"
+                                   required>
+                        </td>
+
+                        <td>
+                            <span th:if="${not record.approved}"
+                                  class="badge badge-pending">
+                                Pending Approval
+                            </span>
+                            <span th:if="${record.approved and record.pendingChange}"
+                                  class="badge badge-pending">
+                                Pending Edit
+                            </span>
+                            <span th:if="${record.approved and not record.pendingChange}"
+                                  class="badge badge-approved">
+                                Approved
+                            </span>
+                        </td>
+
+                        <td>
+                            <form method="post"
+                                  th:action="@{/scientist/record/delete}"
+                                  onsubmit="return confirm('Are you sure you want to delete this record?');">
+
+                                <input type="hidden"
+                                       name="recordId"
+                                       th:value="${record.id}">
+
+                                <input type="hidden"
+                                       name="countryId"
+                                       th:value="${selectedCountry.id}">
+
+                                <button type="submit"
+                                        class="button red small">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <form id="recordsUpdateForm"
+                  method="post"
+                  th:action="@{/scientist/records/update}"
+                  th:if="${not records.isEmpty()}"
+                  class="bulk-save-row">
+
+                <button type="submit"
+                        class="button green">
+                    Save All Changes
+                </button>
+            </form>
+
+            <hr>
+
+            <h3>Add New Record</h3>
+
+            <form method="post"
+                  th:action="@{/scientist/record/add}"
+                  class="add-record-form">
+
+                <input type="hidden"
+                       name="countryId"
+                       th:value="${selectedCountry.id}">
+
+                <label>
+                    Reporting Year
+                    <input type="number"
+                           name="reportingYear"
+                           required>
+                </label>
+
+                <label>
+                    Emission Value (kt)
+                    <input type="number"
+                           step="any"
+                           name="emissionValue"
+                           required>
+                </label>
+
+                <label>
+                    Source
+                    <input type="text"
+                           name="source"
+                           required>
+                </label>
+
+                <button type="submit"
+                        class="button green">
+                    Add
+                </button>
+            </form>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script th:src="@{/js/search-filter.js}"></script>
+<script>
+    enableLiveFilter('search', 'tbody tr', '.table-wrapper.scrollable');
+</script>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>

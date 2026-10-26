@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: head('Log In')}"></head>
+
+<body>
+
+<header th:replace="~{fragments/header :: header}"></header>
+
+<main class="login-container">
+
+    <section class="login-card">
+
+        <h1>Log In</h1>
+
+        <div th:if="${error}"
+             class="error-message"
+             th:text="${error}">
+            Error
+        </div>
+
+        <form method="post"
+              th:action="@{/login}">
+
+            <label for="email">
+                Email
+            </label>
+
+            <input id="email"
+                   name="email"
+                   type="email"
+                   required
+            >
+
+            <label for="password">
+                Password
+            </label>
+
+            <input id="password"
+                   name="password"
+                   type="password"
+                   required
+            >
+
+            <div class="button-row">
+                <button type="submit"
+                        class="button orange">
+                    Log In
+                </button>
+            </div>
+        </form>
+
+        <div class="login-info">
+            <strong>Test Accounts</strong>
+            <br>
+            Scientist: scientist1@likeherotozero.de / scientist1
+            <br>
+            Admin: admin@likeherotozero.de / admin
+        </div>
+
+    </section>
+
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>

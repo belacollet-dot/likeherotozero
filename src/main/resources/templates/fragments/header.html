@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title th:text="${title}">
+        LikeHeroToZero
+    </title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:src="@{/js/validation-messages.js}"></script>
+</head>
+
+<body>
+
+<header th:fragment="header">
+    <nav class="navbar">
+        <a class="brand" th:href="@{/}">
+            <div class="logo-box">
+                <img th:src="@{/images/logo.png}" alt="Logo Like Hero To Zero" />
+            </div>            
+            <span>Like Hero To Zero</span>
+        </a>
+
+        <div class="nav-links">
+            <a th:href="@{/}">Home</a>
+
+            <a th:if="${session.role == null}"
+               th:href="@{/login}">
+                Log In
+            </a>
+
+            <details class="nav-dropdown"
+                      th:if="${session.role != null}">
+                <summary th:text="${session.displayName}">Account</summary>
+                <div class="nav-dropdown-menu">
+                    <a th:if="${session.role == 'SCIENTIST'}"
+                       th:href="@{/scientist}">
+                        Dashboard
+                    </a>
+                    <a th:if="${session.role == 'ADMIN'}"
+                       th:href="@{/admin}">
+                        Dashboard
+                    </a>
+                    <a th:href="@{/logout}">
+                        Log Out
+                    </a>
+                </div>
+            </details>
+        </div>
+    </nav>
+</header>
